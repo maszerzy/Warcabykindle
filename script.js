@@ -1,67 +1,68 @@
-const board = document.getElementById("board");
-const rows = 8, cols = 8;
-let selectedPiece = null;
-let currentPlayer = "white";
+var board = document.getElementById("board");
+var rows = 8, cols = 8;
+var selectedPiece = null;
+var currentPlayer = "white";
 
 function createCell(row, col) {
-    const cell = document.createElement("div");
-    cell.classList.add("cell");
-    cell.dataset.row = row;
-    cell.dataset.col = col;
-    const isBlack = (row + col) % 2 === 1;
-    cell.classList.add(isBlack ? "black" : "white");
+    var cell = document.createElement("div");
+    cell.className = "cell";
+    cell.setAttribute("data-row", row);
+    cell.setAttribute("data-col", col);
+    var isBlack = (row + col) % 2 === 1;
+    cell.className += isBlack ? " black" : " white";
 
     if (isBlack && row < 3) {
-        const piece = document.createElement("div");
-        piece.classList.add("piece", "black-piece");
+        var piece = document.createElement("div");
+        piece.className = "piece black-piece";
         cell.appendChild(piece);
     } else if (isBlack && row > 4) {
-        const piece = document.createElement("div");
-        piece.classList.add("piece", "white-piece");
+        var piece = document.createElement("div");
+        piece.className = "piece white-piece";
         cell.appendChild(piece);
     }
 
-    cell.addEventListener("click", () => onCellClick(cell));
+    cell.onclick = function() {
+        onCellClick(cell);
+    };
     board.appendChild(cell);
 }
 
 function onCellClick(cell) {
-    const piece = cell.querySelector(".piece");
+    var piece = cell.getElementsByClassName("piece")[0];
     if (selectedPiece) {
-        if (!piece && isValidMove(selectedPiece.parentElement, cell)) {
-            movePiece(selectedPiece.parentElement, cell);
+        if (!piece && isValidMove(selectedPiece.parentNode, cell)) {
+            movePiece(selectedPiece.parentNode, cell);
             selectedPiece = null;
         } else {
-            selectedPiece.classList.remove("selected");
+            selectedPiece.className = selectedPiece.className.replace(" selected", "");
             selectedPiece = null;
         }
-    } else if (piece && piece.classList.contains(currentPlayer + "-piece")) {
+    } else if (piece && piece.className.indexOf(currentPlayer + "-piece") !== -1) {
         selectedPiece = piece;
-        piece.classList.add("selected");
+        piece.className += " selected";
     }
 }
 
 function isValidMove(fromCell, toCell) {
-    const fromRow = parseInt(fromCell.dataset.row);
-    const fromCol = parseInt(fromCell.dataset.col);
-    const toRow = parseInt(toCell.dataset.row);
-    const toCol = parseInt(toCell.dataset.col);
-    const piece = fromCell.querySelector(".piece");
+    var fromRow = parseInt(fromCell.getAttribute("data-row"));
+    var fromCol = parseInt(fromCell.getAttribute("data-col"));
+    var toRow = parseInt(toCell.getAttribute("data-row"));
+    var toCol = parseInt(toCell.getAttribute("data-col"));
+    var piece = fromCell.getElementsByClassName("piece")[0];
 
-    const direction = piece.classList.contains("white-piece") ? -1 : 1;
+    var direction = piece.className.indexOf("white-piece") !== -1 ? -1 : 1;
 
-    // Normalny ruch o jedno pole
     if (Math.abs(toCol - fromCol) === 1 && toRow - fromRow === direction) {
         return true;
     }
 
-    // Bicie
     if (Math.abs(toCol - fromCol) === 2 && toRow - fromRow === 2 * direction) {
-        const midRow = (fromRow + toRow) / 2;
-        const midCol = (fromCol + toCol) / 2;
-        const midCell = getCell(midRow, midCol);
-        const midPiece = midCell?.querySelector(".piece");
-        if (midPiece && !midPiece.classList.contains(currentPlayer + "-piece")) {
+        var midRow = (fromRow + toRow) / 2;
+        var midCol = (fromCol + toCol) / 2;
+        var midCell = getCell(midRow, midCol);
+        if (!midCell) return false;
+        var midPiece = midCell.getElementsByClassName("piece")[0];
+        if (midPiece && midPiece.className.indexOf(currentPlayer + "-piece") === -1) {
             midCell.removeChild(midPiece);
             return true;
         }
@@ -70,19 +71,19 @@ function isValidMove(fromCell, toCell) {
 }
 
 function movePiece(fromCell, toCell) {
-    const piece = fromCell.querySelector(".piece");
+    var piece = fromCell.getElementsByClassName("piece")[0];
     fromCell.removeChild(piece);
     toCell.appendChild(piece);
-    piece.classList.remove("selected");
+    piece.className = piece.className.replace(" selected", "");
     currentPlayer = currentPlayer === "white" ? "black" : "white";
 }
 
 function getCell(row, col) {
-    return document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+    return document.querySelector(".cell[data-row='" + row + "'][data-col='" + col + "']");
 }
 
-for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
+for (var row = 0; row < rows; row++) {
+    for (var col = 0; col < cols; col++) {
         createCell(row, col);
     }
 }
