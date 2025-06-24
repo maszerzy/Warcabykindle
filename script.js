@@ -47,51 +47,25 @@ function isValidMove(fromCell, toCell) {
     const toRow = parseInt(toCell.dataset.row);
     const toCol = parseInt(toCell.dataset.col);
     const piece = fromCell.querySelector(".piece");
-    const isKing = piece.classList.contains("king");
-
-    const rowDiff = toRow - fromRow;
-    const colDiff = toCol - fromCol;
 
     const direction = piece.classList.contains("white-piece") ? -1 : 1;
 
-    // Normal pionek move
-    if (!isKing) {
-        if (Math.abs(colDiff) === 1 && rowDiff === direction) {
-            return true;
-        }
-        if (Math.abs(colDiff) === 2 && rowDiff === 2 * direction) {
-            const midRow = (fromRow + toRow) / 2;
-            const midCol = (fromCol + toCol) / 2;
-            const midCell = getCell(midRow, midCol);
-            const midPiece = midCell?.querySelector(".piece");
-            if (midPiece && !midPiece.classList.contains(currentPlayer + "-piece")) {
-                midCell.removeChild(midPiece);
-                return true;
-            }
-        }
-    }
-
-    // Ruch damki po przekątnych
-    if (isKing && Math.abs(rowDiff) === Math.abs(colDiff)) {
-        const steps = Math.abs(rowDiff);
-        let stepRow = rowDiff / steps;
-        let stepCol = colDiff / steps;
-        let enemyFound = false;
-
-        for (let i = 1; i < steps; i++) {
-            const midCell = getCell(fromRow + i * stepRow, fromCol + i * stepCol);
-            const midPiece = midCell?.querySelector(".piece");
-            if (midPiece) {
-                if (midPiece.classList.contains(currentPlayer + "-piece") || enemyFound) {
-                    return false;
-                }
-                midCell.removeChild(midPiece);
-                enemyFound = true;
-            }
-        }
+    // Normalny ruch o jedno pole
+    if (Math.abs(toCol - fromCol) === 1 && toRow - fromRow === direction) {
         return true;
     }
 
+    // Bicie
+    if (Math.abs(toCol - fromCol) === 2 && toRow - fromRow === 2 * direction) {
+        const midRow = (fromRow + toRow) / 2;
+        const midCol = (fromCol + toCol) / 2;
+        const midCell = getCell(midRow, midCol);
+        const midPiece = midCell?.querySelector(".piece");
+        if (midPiece && !midPiece.classList.contains(currentPlayer + "-piece")) {
+            midCell.removeChild(midPiece);
+            return true;
+        }
+    }
     return false;
 }
 
@@ -100,15 +74,6 @@ function movePiece(fromCell, toCell) {
     fromCell.removeChild(piece);
     toCell.appendChild(piece);
     piece.classList.remove("selected");
-
-    // Promocja na damkę
-    const toRow = parseInt(toCell.dataset.row);
-    if (piece.classList.contains("white-piece") && toRow === 0) {
-        piece.classList.add("king");
-    } else if (piece.classList.contains("black-piece") && toRow === 7) {
-        piece.classList.add("king");
-    }
-
     currentPlayer = currentPlayer === "white" ? "black" : "white";
 }
 
