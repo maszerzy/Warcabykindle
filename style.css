@@ -1,0 +1,33 @@
+body {
+  font-family: sans-serif;
+  background: #fff;
+  color: #000;
+  text-align: center;
+}
+#board {
+  width: 240px;
+  margin: 10px auto;
+  font-size: 0;
+}
+.square {
+  width: 30px;
+  height: 30px;
+  float: left;
+  position: relative;
+}
+.light { background: #eee; }
+.dark { background: #444; }
+.piece {
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  margin: 3px;
+}
+.red { background: red; }
+.black { background: black; }
+.king {
+  border: 2px solid yellow;
+}
+.selected {
+  outline: 2px dashed #ff0;
+}
