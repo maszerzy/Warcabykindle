@@ -34,6 +34,10 @@ body {
 }
 
 .piece {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 80%;
   height: 80%;
   margin: 10%;
@@ -50,6 +54,14 @@ body {
   background-color: white;
 }
 
-.selected {
-  border: 2px solid red !important;
+.piece.selected::after {
+  content: "+";
+  color: white;
+  font-weight: bold;
+  font-size: 2em;
+  line-height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
