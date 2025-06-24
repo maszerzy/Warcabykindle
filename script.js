@@ -71,17 +71,23 @@ function getMoves(p) {
   for (var i = 0; i < dirs.length; i++) {
     var dx = dirs[i][1], dy = dirs[i][0];
     var nx = p.x + dx, ny = p.y + dy;
-    if (nx < 0 || nx > 7 || ny < 0 || ny > 7) continue;
-    if (!getPiece(nx, ny)) {
-      list.push({ x: nx, y: ny, capture: null });
-    } else {
+
+    while (nx >= 0 && nx <= 7 && ny >= 0 && ny <= 7) {
       var mid = getPiece(nx, ny);
-      if (mid.color !== p.color) {
-        var jx = nx + dx, jy = ny + dy;
-        if (jx >= 0 && jx <= 7 && jy >= 0 && jy <= 7 && !getPiece(jx, jy)) {
-          list.push({ x: jx, y: jy, capture: mid });
+      if (!mid) {
+        list.push({ x: nx, y: ny, capture: null });
+      } else {
+        if (mid.color !== p.color) {
+          var jx = nx + dx, jy = ny + dy;
+          if (jx >= 0 && jx <= 7 && jy >= 0 && jy <= 7 && !getPiece(jx, jy)) {
+            list.push({ x: jx, y: jy, capture: mid });
+          }
         }
+        break;
       }
+      if (!p.king) break;
+      nx += dx;
+      ny += dy;
     }
   }
   return list;

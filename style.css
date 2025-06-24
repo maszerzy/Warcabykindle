@@ -2,31 +2,42 @@ body {
   font-family: sans-serif;
   background: #fff;
   color: #000;
+  margin: 0;
+  padding: 0;
   text-align: center;
 }
 #board {
-  width: 240px;
+  width: 100vw;
+  max-width: 320px;
   margin: 10px auto;
   font-size: 0;
+  display: block;
 }
 .square {
-  width: 30px;
-  height: 30px;
+  width: 12.5%;
+  padding-bottom: 12.5%;
   float: left;
   position: relative;
+}
+.square::after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
 }
 .light { background: #eee; }
 .dark { background: #444; }
 .piece {
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
-  margin: 3px;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  position: absolute;
+  top: 10%;
+  left: 10%;
 }
-.red { background: red; }
-.black { background: black; }
+.red { background: red; border: 1px solid #333; }
+.black { background: #666; border: 1px solid #ccc; }
 .king {
-  border: 2px solid yellow;
+  border: 3px double yellow;
 }
 .selected {
   outline: 2px dashed #ff0;
