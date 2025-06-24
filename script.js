@@ -1,137 +1,123 @@
+const board = document.getElementById("board");
+const rows = 8, cols = 8;
+let selectedPiece = null;
+let currentPlayer = "white";
 
-var board = document.getElementById("board");
-var info = document.getElementById("info");
-var score = document.getElementById("score");
-var currentPlayer = "red";
-var selected = null;
-var pieces = [];
-var points = { red: 0, black: 0 };
+function createCell(row, col) {
+    const cell = document.createElement("div");
+    cell.classList.add("cell");
+    cell.dataset.row = row;
+    cell.dataset.col = col;
+    const isBlack = (row + col) % 2 === 1;
+    cell.classList.add(isBlack ? "black" : "white");
 
-function createSquare(x, y) {
-  var sq = document.createElement("div");
-  sq.className = "square " + (((x + y) % 2 === 0) ? "light" : "dark");
-  sq.setAttribute("data-x", x);
-  sq.setAttribute("data-y", y);
-  sq.onclick = handleClick;
-  board.appendChild(sq);
+    if (isBlack && row < 3) {
+        const piece = document.createElement("div");
+        piece.classList.add("piece", "black-piece");
+        cell.appendChild(piece);
+    } else if (isBlack && row > 4) {
+        const piece = document.createElement("div");
+        piece.classList.add("piece", "white-piece");
+        cell.appendChild(piece);
+    }
+
+    cell.addEventListener("click", () => onCellClick(cell));
+    board.appendChild(cell);
 }
 
-function createPiece(x, y, color) {
-  var sq = getSquare(x, y);
-  var p = document.createElement("div");
-  p.className = "piece " + color;
-  p.setAttribute("data-color", color);
-  p.setAttribute("data-king", "false");
-  sq.appendChild(p);
-  pieces.push({ x: x, y: y, color: color, king: false, el: p });
-}
-
-function getSquare(x, y) {
-  return document.querySelector('.square[data-x="' + x + '"][data-y="' + y + '"]');
-}
-
-function getPiece(x, y) {
-  for (var i = 0; i < pieces.length; i++) {
-    if (pieces[i].x == x && pieces[i].y == y) return pieces[i];
-  }
-  return null;
-}
-
-function removePiece(p) {
-  p.el.parentNode.removeChild(p.el);
-  var i = pieces.indexOf(p);
-  if (i !== -1) pieces.splice(i, 1);
-  points[currentPlayer]++;
-  updateScore();
-}
-
-function movePiece(p, x, y) {
-  p.x = x;
-  p.y = y;
-  getSquare(x, y).appendChild(p.el);
-  if ((p.color === "red" && y === 0) || (p.color === "black" && y === 7)) {
-    p.king = true;
-    p.el.className += " king";
-  }
-}
-
-function updateInfo(txt) {
-  info.innerHTML = txt || "Tura gracza: " + (currentPlayer === "red" ? "Czerwony" : "Czarny");
-}
-
-function updateScore() {
-  score.innerHTML = "Czerwony: " + points.red + " | Czarny: " + points.black;
-}
-
-function getMoves(p) {
-  var dirs = p.king ? [[1, 1], [1, -1], [-1, 1], [-1, -1]] :
-    (p.color === "red" ? [[-1, -1], [-1, 1]] : [[1, -1], [1, 1]]);
-  var list = [];
-
-  for (var i = 0; i < dirs.length; i++) {
-    var dx = dirs[i][1], dy = dirs[i][0];
-    var nx = p.x + dx, ny = p.y + dy;
-
-    while (nx >= 0 && nx <= 7 && ny >= 0 && ny <= 7) {
-      var mid = getPiece(nx, ny);
-      if (!mid) {
-        list.push({ x: nx, y: ny, capture: null });
-      } else {
-        if (mid.color !== p.color) {
-          var jx = nx + dx, jy = ny + dy;
-          if (jx >= 0 && jx <= 7 && jy >= 0 && jy <= 7 && !getPiece(jx, jy)) {
-            list.push({ x: jx, y: jy, capture: mid });
-          }
+function onCellClick(cell) {
+    const piece = cell.querySelector(".piece");
+    if (selectedPiece) {
+        if (!piece && isValidMove(selectedPiece.parentElement, cell)) {
+            movePiece(selectedPiece.parentElement, cell);
+            selectedPiece = null;
+        } else {
+            selectedPiece.classList.remove("selected");
+            selectedPiece = null;
         }
-        break;
-      }
-      if (!p.king) break;
-      nx += dx;
-      ny += dy;
+    } else if (piece && piece.classList.contains(currentPlayer + "-piece")) {
+        selectedPiece = piece;
+        piece.classList.add("selected");
     }
-  }
-  return list;
 }
 
-function handleClick(e) {
-  var x = parseInt(this.getAttribute("data-x"));
-  var y = parseInt(this.getAttribute("data-y"));
-  var clicked = getPiece(x, y);
+function isValidMove(fromCell, toCell) {
+    const fromRow = parseInt(fromCell.dataset.row);
+    const fromCol = parseInt(fromCell.dataset.col);
+    const toRow = parseInt(toCell.dataset.row);
+    const toCol = parseInt(toCell.dataset.col);
+    const piece = fromCell.querySelector(".piece");
+    const isKing = piece.classList.contains("king");
 
-  if (clicked && clicked.color === currentPlayer) {
-    if (selected) selected.el.classList.remove("selected");
-    selected = clicked;
-    selected.el.classList.add("selected");
-  } else if (selected) {
-    var moves = getMoves(selected);
-    for (var i = 0; i < moves.length; i++) {
-      if (moves[i].x == x && moves[i].y == y) {
-        if (moves[i].capture) removePiece(moves[i].capture);
-        movePiece(selected, x, y);
-        selected.el.classList.remove("selected");
-        selected = null;
-        currentPlayer = currentPlayer === "red" ? "black" : "red";
-        updateInfo();
-        return;
-      }
+    const rowDiff = toRow - fromRow;
+    const colDiff = toCol - fromCol;
+
+    const direction = piece.classList.contains("white-piece") ? -1 : 1;
+
+    // Normal pionek move
+    if (!isKing) {
+        if (Math.abs(colDiff) === 1 && rowDiff === direction) {
+            return true;
+        }
+        if (Math.abs(colDiff) === 2 && rowDiff === 2 * direction) {
+            const midRow = (fromRow + toRow) / 2;
+            const midCol = (fromCol + toCol) / 2;
+            const midCell = getCell(midRow, midCol);
+            const midPiece = midCell?.querySelector(".piece");
+            if (midPiece && !midPiece.classList.contains(currentPlayer + "-piece")) {
+                midCell.removeChild(midPiece);
+                return true;
+            }
+        }
     }
-  }
+
+    // Ruch damki po przekątnych
+    if (isKing && Math.abs(rowDiff) === Math.abs(colDiff)) {
+        const steps = Math.abs(rowDiff);
+        let stepRow = rowDiff / steps;
+        let stepCol = colDiff / steps;
+        let enemyFound = false;
+
+        for (let i = 1; i < steps; i++) {
+            const midCell = getCell(fromRow + i * stepRow, fromCol + i * stepCol);
+            const midPiece = midCell?.querySelector(".piece");
+            if (midPiece) {
+                if (midPiece.classList.contains(currentPlayer + "-piece") || enemyFound) {
+                    return false;
+                }
+                midCell.removeChild(midPiece);
+                enemyFound = true;
+            }
+        }
+        return true;
+    }
+
+    return false;
 }
 
-function init() {
-  board.innerHTML = "";
-  pieces = [];
-  for (var y = 0; y < 8; y++) {
-    for (var x = 0; x < 8; x++) {
-      createSquare(x, y);
-      if ((x + y) % 2 === 1) {
-        if (y < 3) createPiece(x, y, "black");
-        else if (y > 4) createPiece(x, y, "red");
-      }
+function movePiece(fromCell, toCell) {
+    const piece = fromCell.querySelector(".piece");
+    fromCell.removeChild(piece);
+    toCell.appendChild(piece);
+    piece.classList.remove("selected");
+
+    // Promocja na damkę
+    const toRow = parseInt(toCell.dataset.row);
+    if (piece.classList.contains("white-piece") && toRow === 0) {
+        piece.classList.add("king");
+    } else if (piece.classList.contains("black-piece") && toRow === 7) {
+        piece.classList.add("king");
     }
-  }
-  updateInfo();
-  updateScore();
+
+    currentPlayer = currentPlayer === "white" ? "black" : "white";
 }
 
-init();
+function getCell(row, col) {
+    return document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+}
+
+for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+        createCell(row, col);
+    }
+}
