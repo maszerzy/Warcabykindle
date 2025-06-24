@@ -87,3 +87,7 @@ for (var row = 0; row < rows; row++) {
         createCell(row, col);
     }
 }
+
+function restartGame() {
+  location.reload();
+}
