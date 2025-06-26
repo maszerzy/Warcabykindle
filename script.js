@@ -1,131 +1,106 @@
+const board = document.getElementById('board');
+const score = document.getElementById('scoreboard');
+const restartBtn = document.getElementById('restart');
+let cells = [];
+let pieces = [];
+let selected = null;
+let currentPlayer = 1;
+let scores = {1: 0, 2: 0};
 
-window.onload = () => {
-  const canvas = document.getElementById("board");
-  const ctx = canvas.getContext("2d");
-  const tileSize = canvas.width / 8;
-  let board = [];
-  let selected = null;
-  let currentPlayer = "white";
-
-  function resetBoard() {
-    board = Array(8).fill().map(() => Array(8).fill(null));
-    for (let y = 0; y < 8; y++) {
-      for (let x = 0; x < 8; x++) {
-        if ((x + y) % 2 === 1 && y < 3) board[y][x] = { color: "black", king: false };
-        if ((x + y) % 2 === 1 && y > 4) board[y][x] = { color: "white", king: false };
-      }
+function createBoard() {
+    board.innerHTML = '';
+    cells = [];
+    for (let i = 0; i < 64; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        const row = Math.floor(i / 8);
+        const col = i % 8;
+        if ((row + col) % 2 === 1) {
+            cell.classList.add('black');
+            if (row < 3) addPiece(cell, 2);
+            if (row > 4) addPiece(cell, 1);
+        } else {
+            cell.classList.add('white');
+        }
+        cell.dataset.index = i;
+        cell.addEventListener('click', () => handleClick(cell));
+        board.appendChild(cell);
+        cells.push(cell);
     }
-    selected = null;
     updateScore();
-  }
+}
 
-  function updateScore() {
-    let white = 0, black = 0;
-    for (let row of board)
-      for (let piece of row)
-        if (piece) (piece.color === "white" ? white++ : black++);
-    document.getElementById("scoreboard").textContent = `Białe: ${white} | Czarne: ${black}`;
-  }
+function addPiece(cell, player) {
+    const piece = document.createElement('div');
+    piece.classList.add('piece', 'p' + player);
+    cell.appendChild(piece);
+}
 
-  function drawBoard() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let y = 0; y < 8; y++) {
-      for (let x = 0; x < 8; x++) {
-        ctx.fillStyle = (x + y) % 2 === 0 ? "#f0d9b5" : "#b58863";
-        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-
-        const piece = board[y][x];
-        if (piece) {
-          ctx.beginPath();
-          ctx.arc(x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, tileSize / 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = piece.color === "white" ? "#ffffff" : "#000000";
-          ctx.fill();
-
-          if (piece.king) {
-            ctx.strokeStyle = piece.color === "white" ? "#000" : "#fff";
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(x * tileSize + tileSize * 0.3, y * tileSize + tileSize * 0.5);
-            ctx.lineTo(x * tileSize + tileSize * 0.7, y * tileSize + tileSize * 0.5);
-            ctx.stroke();
-          }
-
-          if (selected && selected.x === x && selected.y === y) {
-            ctx.fillStyle = piece.color === "white" ? "#000" : "#fff";
-            ctx.font = "bold 18px sans-serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText("×", x * tileSize + tileSize / 2, y * tileSize + tileSize / 2);
-          }
-        }
-      }
-    }
-  }
-
-  function getMoves(x, y, piece) {
-    const dirs = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
-    const moves = [];
-
-    for (let [dx, dy] of dirs) {
-      for (let i = 1; i < (piece.king ? 8 : 2); i++) {
-        let nx = x + dx * i;
-        let ny = y + dy * i;
-        if (nx < 0 || ny < 0 || nx >= 8 || ny >= 8) break;
-        if (board[ny][nx]) {
-          if (board[ny][nx].color !== piece.color) {
-            let jx = nx + dx;
-            let jy = ny + dy;
-            if (jx >= 0 && jy >= 0 && jx < 8 && jy < 8 && !board[jy][jx])
-              moves.push({ x: jx, y: jy, capture: { x: nx, y: ny } });
-          }
-          break;
-        } else {
-          if (!piece.king && i === 1) moves.push({ x: nx, y: ny });
-          if (piece.king) moves.push({ x: nx, y: ny });
-        }
-      }
-    }
-    return moves;
-  }
-
-  function handleClick(e) {
-    const rect = canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / tileSize);
-    const y = Math.floor((e.clientY - rect.top) / tileSize);
+function handleClick(cell) {
+    const piece = cell.querySelector('.piece');
     if (selected) {
-      const piece = board[selected.y][selected.x];
-      const valid = getMoves(selected.x, selected.y, piece);
-      const move = valid.find(m => m.x === x && m.y === y);
-      if (move) {
-        if (move.capture) board[move.capture.y][move.capture.x] = null;
-        board[y][x] = piece;
-        board[selected.y][selected.x] = null;
-        if ((piece.color === "white" && y === 0) || (piece.color === "black" && y === 7)) piece.king = true;
-        const chain = move.capture && getMoves(x, y, piece).some(m => m.capture);
-        if (move.capture && chain) {
-          selected = { x, y };
-        } else {
-          selected = null;
-          currentPlayer = currentPlayer === "white" ? "black" : "white";
+        if (!piece && validMove(selected.cell, cell)) {
+            movePiece(selected.cell, cell);
+            currentPlayer = 3 - currentPlayer;
         }
-        updateScore();
-        drawBoard();
-        return;
-      }
+        selected.cell.classList.remove('selected');
+        selected = null;
+    } else if (piece && piece.classList.contains('p' + currentPlayer)) {
+        selected = {cell};
+        cell.classList.add('selected');
     }
-    const piece = board[y][x];
-    if (piece && piece.color === currentPlayer) selected = { x, y };
-    else selected = null;
-    drawBoard();
-  }
+}
 
-  document.getElementById("restart").addEventListener("click", () => {
-    resetBoard();
-    drawBoard();
-  });
+function validMove(fromCell, toCell) {
+    const fromIdx = parseInt(fromCell.dataset.index);
+    const toIdx = parseInt(toCell.dataset.index);
+    const diff = toIdx - fromIdx;
+    const dir = currentPlayer === 1 ? -1 : 1;
+    const rowFrom = Math.floor(fromIdx / 8);
+    const rowTo = Math.floor(toIdx / 8);
+    const colFrom = fromIdx % 8;
+    const colTo = toIdx % 8;
+    const dx = Math.abs(colTo - colFrom);
+    const dy = Math.abs(rowTo - rowFrom);
 
-  canvas.addEventListener("click", handleClick);
+    if (dx !== dy || dx === 0) return false;
+    if (dx === 1 && dy === 1) return true; // simple move
+    if (dx === 2) { // capture
+        const mid = (fromIdx + toIdx) / 2;
+        const midPiece = cells[mid].querySelector('.piece');
+        if (midPiece && !midPiece.classList.contains('p' + currentPlayer)) {
+            cells[mid].innerHTML = '';
+            scores[currentPlayer]++;
+            updateScore();
+            return true;
+        }
+    }
+    return false;
+}
 
-  resetBoard();
-  drawBoard();
-};
+function movePiece(fromCell, toCell) {
+    const piece = fromCell.querySelector('.piece');
+    fromCell.innerHTML = '';
+    toCell.appendChild(piece);
+    maybeKing(piece, toCell);
+}
+
+function maybeKing(piece, cell) {
+    const idx = parseInt(cell.dataset.index);
+    const row = Math.floor(idx / 8);
+    if ((currentPlayer === 1 && row === 0) || (currentPlayer === 2 && row === 7)) {
+        piece.classList.add('king');
+    }
+}
+
+function updateScore() {
+    score.textContent = `Gracz 1: ${scores[1]} | Gracz 2: ${scores[2]}`;
+}
+
+restartBtn.addEventListener('click', () => {
+    scores = {1: 0, 2: 0};
+    currentPlayer = 1;
+    createBoard();
+});
+
+createBoard();
