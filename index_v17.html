@@ -1,17 +1,25 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Warcaby na Kindle</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Warcaby Kindle</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="debug-message" style="font-size: small; text-align: center; padding: 4px;"></div>
-<div id="scoreboard">Gracz 1: 0 | Gracz 2: 0</div>
-  <div id="board"></div>
-  <div style="margin-top: 40px;"><button id="restart">Restart</button></div>
-  <script src="script.js"></script>
-<div id="version">Wersja: v15</div>
+    <div id="top-indicator"></div>
+    <div id="scoreboard">
+        <span>Białe: <span id="white-score">0</span></span>
+        <span>Czarne: <span id="black-score">0</span></span>
+    </div>
+    <div id="board-container">
+        <svg id="board" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"></svg>
+    </div>
+    <div id="bottom-indicator"></div>
+    <button id="restart-btn">Restart</button>
+    <div id="debug-message">JS załadowany: 20:07:02</div>
+    <footer>Wersja: v17</footer>
+    <script src="script_v17.js"></script>
 </body>
 </html>
