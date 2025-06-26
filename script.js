@@ -1,3 +1,5 @@
+
+document.getElementById("debug-message").textContent = "JS załadowany: 19:38:35";
 const boardEl = document.getElementById("board");
 const restartBtn = document.getElementById("restart");
 const scoreEl = document.getElementById("scoreboard");
