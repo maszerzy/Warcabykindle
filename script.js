@@ -82,7 +82,6 @@ if (moreJumps.length > 0 && move.jumped) {
 } else {
   clearHighlights();
   switchPlayer();
-  updateTurnIndicator();
 }
     } else {
       selected = null;
@@ -124,6 +123,7 @@ function movePiece(fromRow, fromCol, toRow, toCol) {
 }
 
 function switchPlayer() {
+  console.log('Zmieniam gracza. Aktualny gracz: ' + currentPlayer);
   currentPlayer = currentPlayer === 1 ? 2 : 1;
 }
 
@@ -155,6 +155,7 @@ initBoard();
 function updateTurnIndicator() {
   const top = document.getElementById("turn-indicator-top");
   const bottom = document.getElementById("turn-indicator-bottom");
+  if (!top || !bottom) return;
 
   top.classList.remove("active");
   bottom.classList.remove("active");
@@ -165,3 +166,5 @@ function updateTurnIndicator() {
     top.classList.add("active");
   }
 }
+
+window.onload = () => { updateTurnIndicator(); }

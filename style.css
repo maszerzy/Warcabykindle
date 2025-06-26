@@ -112,16 +112,3 @@ circle.inner {
   max-width: 100vw;
   margin: 0 auto;
 }
-
-
-#turn-indicator-top,
-#turn-indicator-bottom {
-  width: 100%;
-  height: 0.7vh;
-  background: transparent;
-}
-
-#turn-indicator-top.active,
-#turn-indicator-bottom.active {
-  background: black;
-}
