@@ -65,3 +65,20 @@ circle.inner {
   padding: 10px 20px;
   font-size: 1em;
 }
+
+
+#turn-indicator-top, #turn-indicator-bottom {
+  height: 6vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#turn-indicator-top.active {
+  background: black;
+}
+
+#turn-indicator-bottom.active {
+  background: white;
+  border: 1px solid black;
+}
