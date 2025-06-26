@@ -82,6 +82,7 @@ if (moreJumps.length > 0 && move.jumped) {
 } else {
   clearHighlights();
   switchPlayer();
+  updateTurnIndicator();
 }
     } else {
       selected = null;
@@ -149,3 +150,18 @@ restartBtn.addEventListener("click", () => {
 });
 
 initBoard();
+
+
+function updateTurnIndicator() {
+  const top = document.getElementById("turn-indicator-top");
+  const bottom = document.getElementById("turn-indicator-bottom");
+
+  top.classList.remove("active");
+  bottom.classList.remove("active");
+
+  if (currentPlayer === 1) {
+    bottom.classList.add("active");
+  } else {
+    top.classList.add("active");
+  }
+}
