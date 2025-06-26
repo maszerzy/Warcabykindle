@@ -169,3 +169,10 @@ function updateTurnIndicator() {
 }
 
 window.onload = () => { updateTurnIndicator(); }
+
+function showDebugMessage(msg) {
+  const el = document.getElementById("debug-message");
+  if (el) {
+    el.textContent = msg;
+  }
+}
