@@ -26,7 +26,7 @@ body {
 .cell {
     position: relative;
     width: 100%;
-    padding-bottom: 100%; /* enforce square */
+    padding-bottom: 100%;
     box-sizing: border-box;
 }
 
@@ -35,10 +35,13 @@ body {
     top: 0; left: 0;
     width: 100%;
     height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .white {
-    background: #f0f0f0;
+    background: #ffffff;
 }
 
 .black {
@@ -46,11 +49,9 @@ body {
 }
 
 .piece {
-    width: 80%;
-    height: 80%;
+    width: 70%;
+    height: 70%;
     border-radius: 50%;
-    margin: auto;
-    margin-top: 10%;
     position: relative;
 }
 
@@ -67,16 +68,24 @@ body {
     box-shadow: inset 0 0 0 3px #555;
 }
 
-.selected .piece::after {
+.selected .p1::after,
+.selected .p2::after {
     content: "";
     position: absolute;
     top: 25%;
     left: 25%;
     width: 50%;
     height: 50%;
-    border: 2px solid #333;
     border-radius: 50%;
     box-sizing: border-box;
+}
+
+.selected .p1::after {
+    border: 2px solid white;
+}
+
+.selected .p2::after {
+    border: 2px solid black;
 }
 
 #restart {
