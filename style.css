@@ -19,16 +19,22 @@ body {
 #board {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    aspect-ratio: 1 / 1;
     width: 100vmin;
     max-width: 100%;
-    box-sizing: border-box;
 }
 
 .cell {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* enforce square */
+    box-sizing: border-box;
+}
+
+.cell > * {
+    position: absolute;
+    top: 0; left: 0;
     width: 100%;
     height: 100%;
-    box-sizing: border-box;
 }
 
 .white {
@@ -45,6 +51,7 @@ body {
     border-radius: 50%;
     margin: auto;
     margin-top: 10%;
+    position: relative;
 }
 
 .p1 {
@@ -58,6 +65,18 @@ body {
 
 .king {
     box-shadow: inset 0 0 0 3px #555;
+}
+
+.selected .piece::after {
+    content: "";
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    height: 50%;
+    border: 2px solid #333;
+    border-radius: 50%;
+    box-sizing: border-box;
 }
 
 #restart {

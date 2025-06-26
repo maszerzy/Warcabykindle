@@ -2,9 +2,8 @@ const board = document.getElementById('board');
 const score = document.getElementById('scoreboard');
 const restartBtn = document.getElementById('restart');
 let cells = [];
-let pieces = [];
 let selected = null;
-let currentPlayer = 1;
+let currentPlayer = 2; // Gracz 2 (biały) zaczyna
 let scores = {1: 0, 2: 0};
 
 function createBoard() {
@@ -39,11 +38,11 @@ function addPiece(cell, player) {
 function handleClick(cell) {
     const piece = cell.querySelector('.piece');
     if (selected) {
+        selected.cell.classList.remove('selected');
         if (!piece && validMove(selected.cell, cell)) {
             movePiece(selected.cell, cell);
             currentPlayer = 3 - currentPlayer;
         }
-        selected.cell.classList.remove('selected');
         selected = null;
     } else if (piece && piece.classList.contains('p' + currentPlayer)) {
         selected = {cell};
@@ -55,7 +54,6 @@ function validMove(fromCell, toCell) {
     const fromIdx = parseInt(fromCell.dataset.index);
     const toIdx = parseInt(toCell.dataset.index);
     const diff = toIdx - fromIdx;
-    const dir = currentPlayer === 1 ? -1 : 1;
     const rowFrom = Math.floor(fromIdx / 8);
     const rowTo = Math.floor(toIdx / 8);
     const colFrom = fromIdx % 8;
@@ -88,7 +86,7 @@ function movePiece(fromCell, toCell) {
 function maybeKing(piece, cell) {
     const idx = parseInt(cell.dataset.index);
     const row = Math.floor(idx / 8);
-    if ((currentPlayer === 1 && row === 0) || (currentPlayer === 2 && row === 7)) {
+    if ((piece.classList.contains('p1') && row === 0) || (piece.classList.contains('p2') && row === 7)) {
         piece.classList.add('king');
     }
 }
@@ -99,7 +97,7 @@ function updateScore() {
 
 restartBtn.addEventListener('click', () => {
     scores = {1: 0, 2: 0};
-    currentPlayer = 1;
+    currentPlayer = 2;
     createBoard();
 });
 
