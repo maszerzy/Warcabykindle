@@ -87,3 +87,15 @@ circle.inner {
 .cell.highlight {
   outline: 2px dashed gray;
 }
+
+
+#board {
+  border: 1px solid black;
+}
+
+#version {
+  font-size: 10px;
+  text-align: center;
+  margin-top: 0.5vh;
+  color: #000;
+}
