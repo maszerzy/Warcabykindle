@@ -124,6 +124,7 @@ function movePiece(fromRow, fromCol, toRow, toCol) {
 
 function switchPlayer() {
   console.log('Zmieniam gracza. Aktualny gracz: ' + currentPlayer);
+  updateTurnIndicator();
   currentPlayer = currentPlayer === 1 ? 2 : 1;
 }
 
