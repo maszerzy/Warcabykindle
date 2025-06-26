@@ -3,34 +3,38 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <title>Warcaby Kindle</title>
+  <title>Warcaby</title>
   <style>
     body {
       margin: 0;
       font-family: sans-serif;
-      background: white;
       display: flex;
       flex-direction: column;
       align-items: center;
+      background: white;
     }
     canvas {
-      width: 90vmin;
-      height: 90vmin;
+      width: 100vmin;
+      height: 100vmin;
+      max-width: 100vw;
+      max-height: 100vh;
+      touch-action: manipulation;
+      border: 2px solid black;
     }
     #scoreboard {
-      margin-top: 1em;
+      margin: 0.5em;
       font-size: 1.2em;
     }
     #restart {
-      margin-top: 1em;
+      margin: 0.5em;
       font-size: 1em;
     }
   </style>
 </head>
 <body>
-  <h1>Warcaby</h1>
-  <canvas id="board" width="400" height="400"></canvas>
+  <h2>Warcaby</h2>
   <div id="scoreboard">Białe: 0 | Czarne: 0</div>
+  <canvas id="board" width="400" height="400"></canvas>
   <button id="restart">Restart</button>
   <script src="script.js"></script>
 </body>

@@ -31,29 +31,32 @@ window.onload = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let y = 0; y < 8; y++) {
       for (let x = 0; x < 8; x++) {
-        ctx.fillStyle = (x + y) % 2 === 0 ? "#eee" : "#444";
+        ctx.fillStyle = (x + y) % 2 === 0 ? "#f0d9b5" : "#b58863";
         ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+
         const piece = board[y][x];
         if (piece) {
           ctx.beginPath();
           ctx.arc(x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, tileSize / 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = piece.color === "white" ? "#ccc" : "#222";
+          ctx.fillStyle = piece.color === "white" ? "#ffffff" : "#000000";
           ctx.fill();
 
           if (piece.king) {
             ctx.strokeStyle = piece.color === "white" ? "#000" : "#fff";
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.moveTo(x * tileSize + 12, y * tileSize + tileSize / 2);
-            ctx.lineTo(x * tileSize + tileSize - 12, y * tileSize + tileSize / 2);
+            ctx.moveTo(x * tileSize + tileSize * 0.3, y * tileSize + tileSize * 0.5);
+            ctx.lineTo(x * tileSize + tileSize * 0.7, y * tileSize + tileSize * 0.5);
             ctx.stroke();
           }
-        }
 
-        if (selected && selected.x === x && selected.y === y) {
-          ctx.strokeStyle = "#0f0";
-          ctx.lineWidth = 3;
-          ctx.strokeRect(x * tileSize + 2, y * tileSize + 2, tileSize - 4, tileSize - 4);
+          if (selected && selected.x === x && selected.y === y) {
+            ctx.fillStyle = piece.color === "white" ? "#000" : "#fff";
+            ctx.font = "bold 18px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("×", x * tileSize + tileSize / 2, y * tileSize + tileSize / 2);
+          }
         }
       }
     }
@@ -76,10 +79,9 @@ window.onload = () => {
               moves.push({ x: jx, y: jy, capture: { x: nx, y: ny } });
           }
           break;
-        } else if (!piece.king && i === 1) {
-          moves.push({ x: nx, y: ny });
-        } else if (piece.king) {
-          moves.push({ x: nx, y: ny });
+        } else {
+          if (!piece.king && i === 1) moves.push({ x: nx, y: ny });
+          if (piece.king) moves.push({ x: nx, y: ny });
         }
       }
     }
@@ -99,8 +101,13 @@ window.onload = () => {
         board[y][x] = piece;
         board[selected.y][selected.x] = null;
         if ((piece.color === "white" && y === 0) || (piece.color === "black" && y === 7)) piece.king = true;
-        currentPlayer = currentPlayer === "white" ? "black" : "white";
-        selected = null;
+        const chain = move.capture && getMoves(x, y, piece).some(m => m.capture);
+        if (move.capture && chain) {
+          selected = { x, y };
+        } else {
+          selected = null;
+          currentPlayer = currentPlayer === "white" ? "black" : "white";
+        }
         updateScore();
         drawBoard();
         return;
