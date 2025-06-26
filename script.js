@@ -74,7 +74,15 @@ function handleClick(e) {
   if (selected) {
     if (movePiece(selected.row, selected.col, row, col)) {
       selected = null;
-      switchPlayer();
+      const moreJumps = getAvailableJumpsForPiece(toRow, toCol, currentPlayer, piece.king);
+if (moreJumps.length > 0 && move.jumped) {
+  selected = { row: toRow, col: toCol };
+  highlightJumps(moreJumps);
+  return;
+} else {
+  clearHighlights();
+  switchPlayer();
+}
     } else {
       selected = null;
     }

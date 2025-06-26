@@ -82,3 +82,8 @@ circle.inner {
   background: white;
   border: 1px solid black;
 }
+
+
+.cell.highlight {
+  outline: 2px dashed gray;
+}
